@@ -39,3 +39,80 @@ data(nyc_airbnb)
 
 ## Brainstorm questions
 
+* what variables are relevant to higher reviews/scores?
+
+* what are the popular places to rent?
+
+
+```{r}
+nyc_airbnb %>% 
+  group_by(neighbourhood_group, neighbourhood) %>% 
+  distinct() %>% 
+  summarize (
+  mean_review_location = mean(review_scores_location, na.rm = TRUE)
+  ) %>% 
+  arrange(desc(mean_review_location))
+```
+
+* what portion of locations are private rooms / entire apartments?
+
+
+* what variables are relevant to higher price?
+```{r}
+nyc_airbnb %>% 
+  group_by(neighbourhood_group, room_type) %>% 
+  summarize (mean_price = mean(price, na.rm = TRUE)) %>% 
+    pivot_wider(
+      names_from = room_type,
+      values_from = mean_price
+  ) 
+```
+
+```{r}
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan", room_type == "Entire home/apt",
+  price > 1000) %>% 
+  ggplot(aes(x = price)) +
+  geom_histogram()
+```
+
+price vs. rating?
+```{r}
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan") %>% 
+  ggplot(aes(x = stars, y = price)) +
+  geom_point() +
+  facet_grid(. ~ room_type)
+```
+
+somewhat fancy plot
+```{r}
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan") %>% 
+  group_by(neighbourhood) %>% 
+  summarize(mean_price = mean(price, na.rm = TRUE)) %>% 
+  arrange(desc(mean_price))
+```
+
+
+```{r}
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan") %>% 
+  filter(price <= 1000) %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>% 
+  ggplot(aes(x = neighbourhood, y = price)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+
+price vs. location map!
+```{r}
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan") %>% 
+  filter(price <= 1000) %>% 
+  sample_n(1000) %>% 
+  ggplot(aes(x = lat, y = long, color = price)) + geom_point()
+```
+
+
