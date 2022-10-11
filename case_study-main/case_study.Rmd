@@ -1,6 +1,6 @@
 ---
 title: "Case Study"
-output: github_document
+output: html_document
 ---
 
 Today we're studying a case.
@@ -80,7 +80,7 @@ price vs. rating?
 ```{r}
 nyc_airbnb %>% 
   filter(neighbourhood_group == "Manhattan") %>% 
-  ggplot(aes(x = stars, y = price)) +
+  ggplot(aes(x = "stars", y = "price")) +
   geom_point() +
   facet_grid(. ~ room_type)
 ```
@@ -106,7 +106,7 @@ nyc_airbnb %>%
 ```
 
 
-price vs. location map!
+price vs. location psuedo map
 ```{r}
 nyc_airbnb %>% 
   filter(neighbourhood_group == "Manhattan") %>% 
@@ -115,4 +115,17 @@ nyc_airbnb %>%
   ggplot(aes(x = lat, y = long, color = price)) + geom_point()
 ```
 
+! price vs. location real map using leaflet
+```{r}
+library(leaflet)
+pal <- colorNumeric("viridis", domain = c(0, 1000))
+
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan", room_type == "Entire home/apt") %>% 
+  filter(price <= 1000) %>% 
+  sample_n(1000) %>% 
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircleMarkers(~lat, ~long, radius = 0.5, color = ~pal(price))
+```
 
